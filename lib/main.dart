@@ -3,8 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -50,52 +52,62 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.purple,
       ),
 
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder:(context, snapshot) {
-          switch(snapshot.connectionState) {
-            case ConnectionState.done:
-             return Column(
-          children: [
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
             TextField(
               controller: _email,
               autocorrect: false,         
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: 'Enter your email here.',
+                labelText: 'Enter your email here.',
+                prefixIcon: Icon(Icons.email),
+                border: OutlineInputBorder(),
               ),
             ),
+            SizedBox(height: 10),
             TextField(
               controller: _password,
               obscureText: true,
               enableSuggestions: false,
               autocorrect: false,
               decoration: InputDecoration(
-                hintText: ('Enter your password here.'),
+                labelText: ('Enter your password here.'),
+                prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(),
               ),
             ),
-            TextButton(
-              onPressed: () async {
 
-                final email = _email.text;
-                final password = _password.text;
-                final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                  email: email, 
-                  password: password
-                );
-                print(userCredential);
-              },
-              child: Text('Register'),
-            ),
-          ],
-        );
-        default: 
-        return const Text('Loading...');
-          }
-        },
-      )
+            SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+              
+                  final email = _email.text;
+                  final password = _password.text;
+                  final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email, 
+                    password: password
+                    );
+                  print(userCredential);
+                  },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  textStyle: TextStyle(fontSize: 15),
+                ),
+                child: Text('Register'),
+                ),
+              ),
+            ],
+          )
+        ),
+      ),
     );
   }
 }
